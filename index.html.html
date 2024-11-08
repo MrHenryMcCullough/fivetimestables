@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>5 Times Tables Challenge</title>
+    <style>
+    body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+    }
+
+    h1 {
+        font-size: 54px; /* Reduced to half the original size */
+    }
+
+    #start-screen {
+        margin-top: 50px;
+    }
+
+    #game-screen {
+        display: none;
+        margin-top: 50px;
+    }
+
+    .input-container {
+        margin-top: 20px;
+        text-align: center;
+    }
+
+    input {
+        font-size: 45px; /* Reduced to half the original size */
+        text-align: center;
+        padding: 10px;
+        width: 60px;
+        margin-right: 10px;
+        border: 2px solid black;
+        border-radius: 5px;
+        outline: none;
+        -moz-appearance: textfield; /* Removes the spinner on Firefox */
+        -webkit-appearance: none;  /* Removes the spinner on WebKit-based browsers */
+    }
+
+    input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    #start-screen button {
+        font-size: 120px; /* Increased to triple the original size */
+        padding: 40px 60px;  /* Increased padding */
+        cursor: pointer;
+        background-color: #4CAF50; /* Green background for visibility */
+        color: white; /* White text */
+        border: none; /* No border */
+        border-radius: 10px; /* Rounded corners */
+    }
+
+    #timer, #score {
+        font-size: 30px; /* Reduced to half the original size */
+        margin-top: 20px;
+    }
+
+    #feedback {
+        font-size: 30px; /* Reduced to half the original size */
+        margin-top: 20px;
+    }
+
+    #feedback.green {
+        color: green;
+    }
+
+    #feedback.red {
+        color: red;
+    }
+
+    #end-screen {
+        display: none;
+        margin-top: 50px;
+    }
+
+    #final-score {
+        font-size: 40px; /* Reduced to half the original size */
+    }
+</style>
+
+</head>
+<body>
+    <h1>5 Times Tables Challenge</h1>
+    
+    <div id="start-screen">
+        <button onclick="startGame()">Start</button>
+    </div>
+
+    <div id="game-screen">
+        <div id="question" style="font-size: 40px;"></div>
+
+        <div class="input-container">
+            <input type="number" id="answer" oninput="this.value = this.value.replace(/[^0-9]/g, '')" onkeydown="checkAnswerOnEnter(event)">
+        </div>
+
+        <div id="timer">Time: <span id="time">30</span>s</div>
+        <div id="score">Correct Answers: <span id="score-count">0</span></div>
+        <div id="feedback"></div>
+    </div>
+
+    <div id="end-screen">
+        <h2>Your score was: <span id="final-score"></span></h2>
+        <button onclick="restartGame()">Restart</button>
+    </div>
+
+    <script>
+        let correctAnswers = 0;
+        let timeLeft = 30;
+        let timer;
+        let currentQuestion;
+
+        // Start game function
+        function startGame() {
+            document.getElementById("start-screen").style.display = "none";
+            document.getElementById("game-screen").style.display = "block";
+            document.getElementById("timer").style.display = "block";
+            document.getElementById("score").style.display = "block";
+            startTimer();
+            generateQuestion();
+        }
+
+        // Generate a random multiplication question (0x5 to 12x5)
+        function generateQuestion() {
+            currentQuestion = Math.floor(Math.random() * 13); // Random number between 0 and 12
+            document.getElementById("question").textContent = `${currentQuestion} x 5 = `;
+        }
+
+        // Check answer function
+        function checkAnswer() {
+            let answer = parseInt(document.getElementById("answer").value);
+            if (isNaN(answer) || answer === "") {
+                document.getElementById("feedback").textContent = "Please enter a number!";
+                document.getElementById("feedback").className = "red";
+                return;
+            }
+
+            if (answer === currentQuestion * 5) {
+                correctAnswers++;
+                document.getElementById("score-count").textContent = correctAnswers;
+                document.getElementById("feedback").textContent = "Well done!";
+                document.getElementById("feedback").className = "green"; // Green for correct
+                generateQuestion();
+                document.getElementById("answer").value = ''; // Clear input field
+            } else {
+                document.getElementById("feedback").textContent = "Try again!";
+                document.getElementById("feedback").className = "red"; // Red for wrong
+            }
+        }
+
+        // Handle Enter key press
+        function checkAnswerOnEnter(event) {
+            if (event.key === 'Enter') {
+                checkAnswer();  // Submit answer when Enter is pressed
+            }
+        }
+
+        // Timer function
+        function startTimer() {
+            timer = setInterval(function () {
+                timeLeft--;
+                document.getElementById("time").textContent = timeLeft;
+
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    endGame();
+                }
+            }, 1000);
+        }
+
+        // End game function
+        function endGame() {
+            document.getElementById("game-screen").style.display = "none";
+            document.getElementById("end-screen").style.display = "block";
+            document.getElementById("final-score").textContent = correctAnswers;
+        }
+
+        // Restart game function
+        function restartGame() {
+            correctAnswers = 0;
+            timeLeft = 30;
+            document.getElementById("score-count").textContent = correctAnswers;
+            document.getElementById("time").textContent = timeLeft;
+            document.getElementById("end-screen").style.display = "none";
+            document.getElementById("start-screen").style.display = "block";
+            startTimer();  // Restart timer on game restart
+        }
+    </script>
+</body>
+</html>
